@@ -4,6 +4,7 @@ import edu.stanford.nlp.util.CoreMap;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 
 import java.util.ArrayList;
 import java.util.List;

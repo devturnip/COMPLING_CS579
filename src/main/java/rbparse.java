@@ -6,8 +6,10 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -28,11 +30,34 @@ public class rbparse {
             PDFTextStripper tStripper = new PDFTextStripper();
 
             String pdfFileInText = tStripper.getText(pdf);
-            System.out.println(pdfFileInText);
+
+            //System.out.println(pdfFileInText);
 
             pdf.close();
+
+            String PARAGRAPH_SPLIT_REGEX = "(?m)(?=^\\s{4})";
+            String[] paragraphs = pdfFileInText.split(PARAGRAPH_SPLIT_REGEX);
+            for (String paragraph : paragraphs) {
+                if (!paragraph.equals("")) {
+                    //System.out.println("Paragraph: " + paragraph.trim());
+                    BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
+                    iterator.setText(paragraph);
+                    int start = iterator.first();
+                    for (int end = iterator.next();
+                         end != BreakIterator.DONE;
+                         start = end, end = iterator.next()) {
+                        String sentence = paragraph.substring(start,end);
+                        sentence = sentence.replace("\n", "").replace("\r", "");
+                        if (sentence.length() > 2) {
+                            System.out.println("Sentence: " + paragraph.substring(start, end));
+                        }
+                    }
+                }
+            }
             } catch (IOException ex) {
             ex.printStackTrace();
+
+
         }
 
         /*Properties props = new Properties();

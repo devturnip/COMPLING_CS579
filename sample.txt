@@ -1,0 +1,5 @@
+The system must allow actors to download their voice clips in a flexible format. 
+Voice clips should be optionally downloadable in a format such as MPEG Audio (mp3) format, 
+since it is widely supported across different web browsers and operating systems. Voice clips 
+should be downloadable for archival purposes or for the purpose of presenting them to other 
+actors. 

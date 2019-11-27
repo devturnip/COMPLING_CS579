@@ -53,6 +53,15 @@ def print_sentence(element):
     for i in element:
         print(i)
 
+def print_clean(element):
+    for i in element:
+        clean_words = ""
+        for y in i:
+            clean_words += (y[0] + " ")
+        clean_words += "\n"
+        print(clean_words)
+
+
 
 def getAccessControlPolicy(sentence):
     return sentence
@@ -135,7 +144,8 @@ def preprocessing(allSentence):
 pdf2txt()
 # picked = pickTop10()
 processedSentence = preprocessing(allSentence)
-print_sentence(processedSentence)
+#print_sentence(processedSentence)
 # print_sentence(result)
+print_clean(processedSentence)
 pdfFileObject.close()
 nlp.close()

@@ -1,5 +1,9 @@
+import edu.stanford.nlp.coref.CorefCoreAnnotations;
+import edu.stanford.nlp.coref.data.CorefChain;
+import edu.stanford.nlp.coref.data.Mention;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -20,6 +24,8 @@ import java.io.IOException;
 
 public class rbparse {
     public static void main(String[] args) {
+        String parseModel = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
+        String[] modalVerbs = {"can", "must", "should", "will", "ought", "may", "can", "shall", "could"};
         try {
 
             PDDocument pdf = PDDocument.load(new File("2007_puget_sound.pdf"));
@@ -35,25 +41,49 @@ public class rbparse {
 
             pdf.close();
 
-            String PARAGRAPH_SPLIT_REGEX = "(?m)(?=^\\s{4})";
-            String[] paragraphs = pdfFileInText.split(PARAGRAPH_SPLIT_REGEX);
-            for (String paragraph : paragraphs) {
-                if (!paragraph.equals("")) {
-                    //System.out.println("Paragraph: " + paragraph.trim());
-                    BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
-                    iterator.setText(paragraph);
-                    int start = iterator.first();
-                    for (int end = iterator.next();
-                         end != BreakIterator.DONE;
-                         start = end, end = iterator.next()) {
-                        String sentence = paragraph.substring(start,end);
-                        sentence = sentence.replace("\n", "").replace("\r", "");
-                        if (sentence.length() > 2) {
-                            System.out.println("Sentence: " + paragraph.substring(start, end));
-                        }
+            BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.ENGLISH);
+            iterator.setText(pdfFileInText);
+            int start = iterator.first();
+                for (int end = iterator.next();
+                     end != BreakIterator.DONE;
+                     start = end, end = iterator.next()) {
+                    String sentence = pdfFileInText.substring(start,end);
+                    Tree parse;
+                    //sentence = sentence.replace("\n", "").replace("\r", "");
+                    if (sentence.length() > 10) {
+                        System.out.print("OG SENTENCE: " + sentence);
+                        System.out.println("\n");
                     }
+                    //begin coref
+                    /*Properties props = new Properties();
+                    props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,parse,coref");
+                    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+                    Annotation document = new Annotation(sentence);
+                    pipeline.annotate(document);
+                    System.out.println("---");
+                    System.out.println("coref chains");
+                    for (CorefChain cc : document.get(CorefCoreAnnotations.CorefChainAnnotation.class).values()) {
+                        System.out.println("\t" + cc);
+                    }
+                    for (CoreMap sentences : document.get(CoreAnnotations.SentencesAnnotation.class)) {
+                        System.out.println("---");
+                        System.out.println("mentions");
+                        for (Mention m : sentences.get(CorefCoreAnnotations.CorefMentionsAnnotation.class)) {
+                            System.out.println("\t" + m);
+                        }
+                        //end coref
+                        for (String item : modalVerbs) {
+                            if (sentence.contains(item)) {
+                                System.out.println("Sentence: " + sentence);
+                                LexicalizedParser lecicalizedParser = LexicalizedParser.loadModel(parseModel);
+                                parse = lecicalizedParser.parse(sentence);
+                                List taggedWords = parse.taggedYield();
+                                System.out.println("Parsed: " + taggedWords);
+                                break;
+                            }
+                        }
+                    }*/
                 }
-            }
             } catch (IOException ex) {
             ex.printStackTrace();
 

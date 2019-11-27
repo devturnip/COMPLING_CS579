@@ -1,6 +1,6 @@
 # COMPLING_CS579
-CS579: Flitered by Verb
-CS579v2: Flitered by Modal Verb
+CS579: Filtered by Verb
+CS579v2: Filtered by Modal Verb
 
 **Instructions**
 1. Download Stanford CoreNLP from http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip and unzip.

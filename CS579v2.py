@@ -13,7 +13,10 @@ nlp = StanfordCoreNLP(r'http://localhost', port=9000)
 allSentence = []
 verb = []
 frequencyVerb = []
+obligation_sentence = []
+acp_sentence = []
 props = {'annotators': 'tokenize,ssplit,pos', 'pipelineLanguage': 'en', 'outputFormat': 'xml'}
+obligation_modal = ['must', 'have to', 'should']
 
 
 def resolve_coref(sentence):
@@ -21,7 +24,7 @@ def resolve_coref(sentence):
     o = nlp.annotate(sentence, properties={'annotators': 'dcoref', 'outputFormat': 'json', 'ner.useSUTime': 'false'})
     output = json.loads(o)
     if 'corefs' in output:
-        #print(output)
+        # print(output)
         for coref in output['corefs']:
             mentions = output['corefs'][coref]
             antecedent = mentions[0]  # the antecedent is the first mention in the coreference chain
@@ -33,7 +36,7 @@ def resolve_coref(sentence):
                     target_token = mention['startIndex'] - 1
                     # transfer the antecedent's word form to the appropriate token in the sentence
                     output['sentences'][target_sentence - 1]['tokens'][target_token]['word'] = antecedent['text']
-                    #print(output)
+                    # print(output)
 
         """ Print the "resolved" output """
         possessives = ['hers', 'his', 'their', 'theirs']
@@ -53,14 +56,15 @@ def print_sentence(element):
     for i in element:
         print(i)
 
+
 def print_clean(element):
     for i in element:
         clean_words = ""
         for y in i:
             clean_words += (y[0] + " ")
-        clean_words += "\n"
-        print(clean_words)
-
+        # clean_words += "\n"
+        getObligationPolicy(clean_words)
+        # print(clean_words)
 
 
 def getAccessControlPolicy(sentence):
@@ -68,7 +72,10 @@ def getAccessControlPolicy(sentence):
 
 
 def getObligationPolicy(sentence):
-    return sentence
+    for md in obligation_modal:
+        if md in sentence:
+            if sentence not in obligation_sentence:
+                obligation_sentence.append(sentence)
 
 
 def checkingverb(checkingVerb):
@@ -144,8 +151,16 @@ def preprocessing(allSentence):
 pdf2txt()
 # picked = pickTop10()
 processedSentence = preprocessing(allSentence)
-#print_sentence(processedSentence)
+# print_sentence(processedSentence)
 # print_sentence(result)
 print_clean(processedSentence)
+
+print("PRINTING OBLIGATIONS...........\n")
+for o in obligation_sentence:
+    print(o.center(40))
+
+
+
+
 pdfFileObject.close()
 nlp.close()

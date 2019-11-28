@@ -1,5 +1,4 @@
 import json
-
 from stanfordcorenlp import StanfordCoreNLP
 import PyPDF2
 from nltk import tokenize
@@ -13,6 +12,7 @@ nlp = StanfordCoreNLP(r'http://localhost', port=9000)
 allSentence = []
 verb = []
 frequencyVerb = []
+full_sentence = []
 obligation_sentence = []
 acp_sentence = []
 props = {'annotators': 'tokenize,ssplit,pos', 'pipelineLanguage': 'en', 'outputFormat': 'xml'}
@@ -64,11 +64,17 @@ def print_clean(element):
             clean_words += (y[0] + " ")
         # clean_words += "\n"
         getObligationPolicy(clean_words)
+        full_sentence.append(clean_words)
         # print(clean_words)
 
 
-def getAccessControlPolicy(sentence):
-    return sentence
+def getAccessControlPolicy():
+    for i in full_sentence:
+        for o in obligation_sentence:
+            if i not in obligation_sentence:
+                if i not in acp_sentence:
+                    acp_sentence.append(i)
+
 
 
 def getObligationPolicy(sentence):
@@ -155,12 +161,21 @@ processedSentence = preprocessing(allSentence)
 # print_sentence(result)
 print_clean(processedSentence)
 
+print("PRINTING FULL LIST...........\n")
+for f in full_sentence:
+    print(f.center(40))
+
+
+print("\n")
 print("PRINTING OBLIGATIONS...........\n")
 for o in obligation_sentence:
     print(o.center(40))
 
-
-
+getAccessControlPolicy()
+print("\n")
+print("PRINTING ACPs...........\n")
+for a in acp_sentence:
+    print(a.center(40))
 
 pdfFileObject.close()
 nlp.close()

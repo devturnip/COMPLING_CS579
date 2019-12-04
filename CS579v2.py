@@ -3,7 +3,7 @@ from stanfordcorenlp import StanfordCoreNLP
 import PyPDF2
 from nltk import tokenize
 
-pdfFileObject = open(r"2007_puget_sound.pdf", 'rb')
+pdfFileObject = open(r"SOFTWARE_REQUIREMENT_SPECIFICATION_SRS_O.pdf", 'rb')
 pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
 # print(" No. Of Pages :", pdfReader.numPages)
 # pageObject = pdfReader.getPage(10)
@@ -16,7 +16,9 @@ full_sentence = []
 obligation_sentence = []
 acp_sentence = []
 props = {'annotators': 'tokenize,ssplit,pos', 'pipelineLanguage': 'en', 'outputFormat': 'xml'}
-obligation_modal = ['must', 'have to', 'should']
+obligation_modal = ['must', 'have to', 'should' , 'need to', 'needs to']
+acp_model = ['allow', 'disallow', 'access', 'responsible for', 'able to', 'prevent']
+
 
 
 def resolve_coref(sentence):
@@ -36,7 +38,7 @@ def resolve_coref(sentence):
                     target_token = mention['startIndex'] - 1
                     # transfer the antecedent's word form to the appropriate token in the sentence
                     output['sentences'][target_sentence - 1]['tokens'][target_token]['word'] = antecedent['text']
-                    # print(output)
+                    #print(output)
 
         """ Print the "resolved" output """
         possessives = ['hers', 'his', 'their', 'theirs']
@@ -72,8 +74,10 @@ def getAccessControlPolicy():
     for i in full_sentence:
         for o in obligation_sentence:
             if i not in obligation_sentence:
-                if i not in acp_sentence:
-                    acp_sentence.append(i)
+                for acp in acp_model:
+                    if acp in i:
+                        if i not in acp_sentence:
+                            acp_sentence.append(i)
 
 
 
@@ -157,13 +161,13 @@ def preprocessing(allSentence):
 pdf2txt()
 # picked = pickTop10()
 processedSentence = preprocessing(allSentence)
-# print_sentence(processedSentence)
-# print_sentence(result)
+#print_sentence(processedSentence)
+
 print_clean(processedSentence)
 
-print("PRINTING FULL LIST...........\n")
-for f in full_sentence:
-    print(f.center(40))
+# print("PRINTING FULL LIST...........\n")
+# for f in full_sentence:
+#     print(f.center(40))
 
 
 print("\n")

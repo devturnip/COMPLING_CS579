@@ -4,6 +4,8 @@ import PyPDF2
 from nltk import tokenize
 
 pdfFileObject = open(r"SOFTWARE_REQUIREMENT_SPECIFICATION_SRS_O.pdf", 'rb')
+#pdfFileObject = open(r"2007_puget_sound.pdf", 'rb')
+#pdfFileObject = open(r"EM-SRS-ReviewSoftRightHospitalManagementSystemSRS.pdf", 'rb')
 pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
 # print(" No. Of Pages :", pdfReader.numPages)
 # pageObject = pdfReader.getPage(10)
@@ -17,8 +19,38 @@ obligation_sentence = []
 acp_sentence = []
 props = {'annotators': 'tokenize,ssplit,pos', 'pipelineLanguage': 'en', 'outputFormat': 'xml'}
 obligation_modal = ['must', 'have to', 'should' , 'need to', 'needs to']
-acp_model = ['allow', 'disallow', 'access', 'responsible for', 'able to', 'prevent']
+acp_model = ['access', 'allow', 'deny']
+#cp_model = ['allow', 'disallow', 'access', 'responsible for', 'able to', 'prevent']
 
+
+def checkingSentence(sentence):
+    isThereSubject = False
+    isThereVerb = False
+    isThereModal = False
+    for word in sentence:
+        if (word[1] == "NN") or (word[1] == "NNS") or (word[1] == "NNP") or (word[1] == "NNPS"):
+            isThereSubject = True
+        if word[1] == "MD":
+            isThereModal = True
+        if (word[1] == "VB") or (word[1] == "VBD") or (word[1] == "VBG") or (word[1] == "VBN") or (
+                word[1] == "VBP") or (word[1] == "VBZ"):
+            isThereVerb = True
+
+    if (isThereSubject == True) and (isThereModal == True) and (isThereVerb == True):
+        return True
+    else:
+        return False
+
+def preprocessing2(allSentence):
+    result = []
+    for sentence in allSentence:  # filter the sentences that have a modal verb
+        # print(sentence)
+        flag = False
+        if (checkingSentence(sentence) == True):
+            flag = True
+        if (flag == True):
+            result.append(sentence)
+    return result
 
 
 def resolve_coref(sentence):
@@ -160,7 +192,7 @@ def preprocessing(allSentence):
 
 pdf2txt()
 # picked = pickTop10()
-processedSentence = preprocessing(allSentence)
+processedSentence = preprocessing2(allSentence)
 #print_sentence(processedSentence)
 
 print_clean(processedSentence)

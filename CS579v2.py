@@ -1,26 +1,25 @@
-import json
 from stanfordcorenlp import StanfordCoreNLP
 import PyPDF2
 from nltk import tokenize
+import json
 
-pdfFileObject = open(r"SOFTWARE_REQUIREMENT_SPECIFICATION_SRS_O.pdf", 'rb')
-#pdfFileObject = open(r"2007_puget_sound.pdf", 'rb')
-#pdfFileObject = open(r"EM-SRS-ReviewSoftRightHospitalManagementSystemSRS.pdf", 'rb')
+#pdfFileObject = open(r"SOFTWARE_REQUIREMENT_SPECIFICATION_SRS_O.pdf", 'rb') #Tony
+pdfFileObject = open(r"C:\Users\user\Downloads\2007_puget_sound.pdf", 'rb') #SungJin
 pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
 # print(" No. Of Pages :", pdfReader.numPages)
 # pageObject = pdfReader.getPage(10)
 
 nlp = StanfordCoreNLP(r'http://localhost', port=9000)
+frequencyVerb = []
 allSentence = []
 verb = []
-frequencyVerb = []
 full_sentence = []
 obligation_sentence = []
 acp_sentence = []
+
 props = {'annotators': 'tokenize,ssplit,pos', 'pipelineLanguage': 'en', 'outputFormat': 'xml'}
 obligation_modal = ['must', 'have to', 'should' , 'need to', 'needs to']
 acp_model = ['access', 'allow', 'deny']
-#cp_model = ['allow', 'disallow', 'access', 'responsible for', 'able to', 'prevent']
 
 
 def checkingSentence(sentence):
@@ -121,7 +120,7 @@ def getObligationPolicy(sentence):
 
 
 def checkingverb(checkingVerb):
-    if (checkingVerb[1] == "MD" or checkingVerb[1] == "VB"):
+    if (checkingVerb[1] == "VB"):
         verb.append(checkingVerb[0])
 
     if (checkingVerb[1] == "VB" or checkingVerb[1] == "VBG" or checkingVerb[1] == "VBN" or checkingVerb[1] == "VBP" or
@@ -144,16 +143,15 @@ def getSentence(sentence):
         # result.append(temp)
 
 
-def pickTop10():  # pick the most frequently verbs top 10
+def pickTopN(N):  # pick the most frequently verbs top 10
     pick = []
     uniqueVerb = list(set(verb))
     for i in uniqueVerb:
         frequencyVerb.append((i, verb.count(i)))
     frequencyVerb.sort(key=lambda element: element[1], reverse=True)
     # print(frequencyVerb)
-    for i in range(0, 15):
-        pick.append(frequencyVerb[i][0])  # append top 10
-    return pick
+    for i in range(0, N):
+        acp_model.append(frequencyVerb[i][0])  # append top 10
 
 
 def pdf2txt():
@@ -191,9 +189,11 @@ def preprocessing(allSentence):
 
 
 pdf2txt()
-# picked = pickTop10()
 processedSentence = preprocessing2(allSentence)
+pickTopN(3)
 #print_sentence(processedSentence)
+#acp_model.append(picked) # Add picked to acp_model
+print(acp_model)
 
 print_clean(processedSentence)
 
